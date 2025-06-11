@@ -55,15 +55,15 @@ export async function signAptosMessageWithSui(
     throw new Error("sui:signPersonalMessage not available");
   }
 
-  const suiPublicKey = suiAccount.publicKey;
+  const suiAccountAddress = suiAccount.address;
 
-  if (!suiPublicKey) {
+  if (!suiAccountAddress) {
     throw new Error("Account not connected");
   }
 
   const aptosPublicKey = new SuiDerivedPublicKey({
     domain,
-    suiPublicKey: suiAccount.publicKey,
+    suiAccountAddress: suiAccount.address,
     authenticationFunction,
   });
 

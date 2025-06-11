@@ -14,11 +14,11 @@ import {
 
 import * as solanaSigner from "./SolanaSigner";
 import * as ethereumSigner from "./EthereumSigner";
-// import {
-//   SuiChains,
-//   SuiUnsignedTransaction,
-// } from "@wormhole-foundation/sdk-sui";
-// import * as suiSigner from "./SuiSigner";
+import {
+  SuiChains,
+  SuiUnsignedTransaction,
+} from "@wormhole-foundation/sdk-sui";
+import * as suiSigner from "./SuiSigner";
 
 import { ChainConfig } from "../../../config";
 import { CrossChainCore } from "../../../CrossChainCore";
@@ -36,7 +36,7 @@ export class Signer<N extends Network, C extends Chain>
     address: string,
     options: any,
     wallet: AdapterWallet,
-    crossChainCore?: CrossChainCore,
+    crossChainCore?: CrossChainCore
   ) {
     this._chain = chain;
     this._address = address;
@@ -61,7 +61,7 @@ export class Signer<N extends Network, C extends Chain>
         tx,
         this._wallet,
         this._options,
-        this._crossChainCore,
+        this._crossChainCore
       );
       txHashes.push(txId);
     }
@@ -74,7 +74,7 @@ export const signAndSendTransaction = async (
   request: UnsignedTransaction<Network, Chain>,
   wallet: AdapterWallet,
   options: any = {},
-  crossChainCore?: CrossChainCore,
+  crossChainCore?: CrossChainCore
 ): Promise<string> => {
   if (!wallet) {
     throw new Error("wallet is undefined");
@@ -85,7 +85,7 @@ export const signAndSendTransaction = async (
       request as SolanaUnsignedTransaction<Network>,
       wallet,
       options,
-      crossChainCore,
+      crossChainCore
     );
     return signature;
   } else if (chain.context === "Ethereum") {
@@ -93,7 +93,13 @@ export const signAndSendTransaction = async (
       request as EvmUnsignedTransaction<Network, EvmChains>,
       wallet,
       chain.displayName,
-      options,
+      options
+    );
+    return tx;
+  } else if (chain.context === "Sui") {
+    const tx = await suiSigner.signAndSendTransaction(
+      request as SuiUnsignedTransaction<Network, SuiChains>,
+      wallet
     );
     return tx;
   } else {

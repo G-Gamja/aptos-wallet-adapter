@@ -22,6 +22,7 @@ import {
   getAptosWalletUSDCBalance,
   getEthereumWalletUSDCBalance,
   getSolanaWalletUSDCBalance,
+  getSuiWalletUSDCBalance,
 } from "./utils/getUsdcBalance";
 
 export interface CrossChainDappConfig {
@@ -41,7 +42,7 @@ export type { AccountAddressInput } from "@aptos-labs/ts-sdk";
 export { NetworkToChainId, NetworkToNodeAPI } from "@aptos-labs/ts-sdk";
 export type AptosAccount = Account;
 
-export type Chain = "Solana" | "Ethereum" | "Sepolia" | "Aptos";
+export type Chain = "Solana" | "Ethereum" | "Sepolia" | "Aptos" | "Sui";
 
 export type CCTPProviders = "Wormhole";
 
@@ -53,7 +54,7 @@ export interface CrossChainProvider<
 > {
   getQuote(params: TQuoteRequest): Promise<TQuoteResponse>;
   initiateCCTPTransfer(
-    params: TInitiateTransferRequest,
+    params: TInitiateTransferRequest
   ): Promise<TInitiateTransferResponse>;
 }
 
@@ -96,14 +97,15 @@ export class CrossChainCore {
 
   async getWalletUSDCBalance(
     walletAddress: string,
-    sourceChain: Chain,
+    sourceChain: Chain
   ): Promise<string> {
     if (sourceChain === "Aptos") {
       return await getAptosWalletUSDCBalance(
         walletAddress,
-        this._dappConfig.aptosNetwork,
+        this._dappConfig.aptosNetwork
       );
     }
+    console.log("sourceChain", sourceChain);
     if (!this.CHAINS[sourceChain]) {
       throw new Error(`Unsupported chain: ${sourceChain}`);
     }
@@ -113,7 +115,7 @@ export class CrossChainCore {
           walletAddress,
           this._dappConfig.aptosNetwork,
           this._dappConfig?.solanaConfig?.rpc ??
-            this.CHAINS[sourceChain].defaultRpc,
+            this.CHAINS[sourceChain].defaultRpc
         );
       case "Ethereum":
       case "Sepolia":
@@ -121,7 +123,13 @@ export class CrossChainCore {
           walletAddress,
           this._dappConfig.aptosNetwork,
           // TODO: maybe let the user config it
-          this.CHAINS[sourceChain].defaultRpc,
+          this.CHAINS[sourceChain].defaultRpc
+        );
+      case "Sui":
+        return await getSuiWalletUSDCBalance(
+          walletAddress,
+          this._dappConfig.aptosNetwork,
+          this.CHAINS[sourceChain].defaultRpc
         );
       default:
         throw new Error(`Unsupported chain: ${sourceChain}`);

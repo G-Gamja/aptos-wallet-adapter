@@ -28,6 +28,7 @@ import { chainToIcon } from "@/app/icons";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import {
   isEIP1193DerivedWallet,
+  isSuiDerivedWallet,
   OriginWalletDetails,
 } from "@/utils/derivedWallet";
 import { isSolanaDerivedWallet } from "@/utils/derivedWallet";
@@ -102,6 +103,8 @@ export function CCTPTransfer({
       setSourceChain("Solana");
     } else if (isEIP1193DerivedWallet(wallet)) {
       setSourceChain("Sepolia");
+    } else if (isSuiDerivedWallet(wallet)) {
+      setSourceChain("Sui");
     } else {
       setSourceChain("Aptos");
     }
